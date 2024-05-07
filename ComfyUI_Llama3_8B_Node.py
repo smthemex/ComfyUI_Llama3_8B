@@ -38,28 +38,28 @@ class Meta_Llama3_8B:
         if reply_language is not None:
             if reply_language == "chinese":
                 user_content = "".join([user_content, "用中文回复我"])
-            if reply_language == "russian":
+            elif reply_language == "russian":
                 user_content = "".join([user_content, "Ответь мне по - русски"])
-            if reply_language == "german":
+            elif reply_language == "german":
                 user_content = "".join([user_content, "Antworte mir auf Deutsch"])
-            if reply_language == "french":
+            elif reply_language == "french":
                 user_content = "".join([user_content, "Répondez - moi en français"])
-            if reply_language == "spanish":
+            elif reply_language == "spanish":
                 user_content = "".join([user_content, "Contáctame en español"])
-            if reply_language == "japanese":
+            else:
                 user_content = "".join([user_content, "日本語で返事して"])
+        else:
+            ...
         if not model_path:
             raise ValueError("need a model_path or repo_id")
         else:
             if not get_model_online:
                 os.environ['TRANSFORMERS_OFFLINE'] = "1"
-            device = "cuda:0" if torch.cuda.is_available() else "cpu"
             try:
                 pipeline = transformers.pipeline(
                     "text-generation",
                     model=model_path,
                     model_kwargs={"torch_dtype": torch.bfloat16},
-                    device=device,
                     device_map="auto",
                 )
                 messages = [
