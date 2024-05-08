@@ -2,7 +2,7 @@
  Llama3_8B for comfyUI， using pipeline workflow
 -----
 
-2024-05-05 更新，加入“nvidia/Llama3-ChatQA-1.5-8B”的QA模型节点  
+2024-05-08 更新，加入“nvidia/Llama3-ChatQA-1.5-8B”的QA模型节点  
 Updated on May 5th, 2024, adding QA model node for "nvidia/Llama3 ChatQA-1.5-8B"   
 -----
 
