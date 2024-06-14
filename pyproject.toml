@@ -1,0 +1,14 @@
+[project]
+name = "comfyui_llama3_8b"
+description = "Llama3_8B for comfyUI， using pipeline workflow."
+version = "1.0.0"
+license = "LICENSE"
+
+[project.urls]
+Repository = "https://github.com/smthemex/ComfyUI_Llama3_8B"
+#  Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = ""
+DisplayName = "ComfyUI_Llama3_8B"
+Icon = ""
