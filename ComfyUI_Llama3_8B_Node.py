@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 import transformers
 from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModel
 import torch
@@ -9,6 +10,33 @@ import folder_paths
 dir_path = os.path.dirname(os.path.abspath(__file__))
 path_dir = os.path.dirname(dir_path)
 file_path = os.path.dirname(path_dir)
+def string_punctuation_bool(string_in):
+    pattern = r"[^\w\s]$"
+    string_bool = bool(re.search(pattern, string_in))
+    return string_bool
+
+def trans_reply(reply_language,user_content):
+    if string_punctuation_bool(user_content):
+        join_punctuation = " "
+    else:
+        join_punctuation = ","
+    if reply_language == "chinese":
+        user_content = f"{join_punctuation}".join([user_content, "用中文回复我"])
+    elif reply_language == "russian":
+        user_content = f"{join_punctuation}".join([user_content, "Ответь мне по - русски"])
+    elif reply_language == "german":
+        user_content = f"{join_punctuation}".join([user_content, "Antworte mir auf Deutsch"])
+    elif reply_language == "french":
+        user_content = f"{join_punctuation}".join([user_content, "Répondez - moi en français"])
+    elif reply_language == "spanish":
+        user_content = f"{join_punctuation}".join([user_content, "Contáctame en español"])
+    elif reply_language == "japanese":
+        user_content = f"{join_punctuation}".join([user_content, "日本語で返事して"])
+    elif reply_language == "english":
+        user_content = f"{join_punctuation}".join([user_content, "answer me in English"])
+    else:
+        user_content = f"{join_punctuation}".join([user_content, "Reply to me in the language of my question mentioned above"])
+    return user_content
 
 paths = []
 for search_path in folder_paths.get_folder_paths("diffusers"):
@@ -26,7 +54,7 @@ else:
 def get_local_path(file_path, model_path):
     path = os.path.join(file_path, "models", "diffusers", model_path)
     model_path = os.path.normpath(path)
-    if sys.platform.startswith('win32'):
+    if sys.platform=='win32':
         model_path = model_path.replace('\\', "/")
     return model_path
 
@@ -40,7 +68,7 @@ def tensor_to_image(tensor):
 
 def get_instance_path(path):
     instance_path = os.path.normpath(path)
-    if sys.platform.startswith('win32'):
+    if sys.platform=='win32':
         instance_path = instance_path.replace('\\', "/")
     return instance_path
 
@@ -94,7 +122,7 @@ class Meta_Llama3_8B:
                     "FLOAT",
                     {"default": 0.9, "min": 0.01, "max": 0.99, "step": 0.01, "round": False, "display": "number"}),
                 "get_model_online": ("BOOLEAN", {"default": True},),
-                "reply_language": (["None", "chinese", "russian", "german", "french", "spanish", "japanese"],),
+                "reply_language": (["english", "chinese", "russian", "german", "french", "spanish", "japanese","Original_language"],),
                 "system_content": (
                     "STRING", {"multiline": True, "default": "你叫何小喵，是一位回复私人对话的二次元白发傲娇猫娘助手"}),
                 "user_content": ("STRING", {"multiline": True, "default": "何小喵，你喜欢吃什么？"})
@@ -108,20 +136,7 @@ class Meta_Llama3_8B:
 
     def meta_llama3_8b(self, repo_id, max_new_tokens, temperature, top_p, get_model_online, reply_language,
                        system_content, user_content):
-        if reply_language == "chinese":
-            user_content = "".join([user_content, "用中文回复我"])
-        elif reply_language == "russian":
-            user_content = "".join([user_content, "Ответь мне по - русски"])
-        elif reply_language == "german":
-            user_content = "".join([user_content, "Antworte mir auf Deutsch"])
-        elif reply_language == "french":
-            user_content = "".join([user_content, "Répondez - moi en français"])
-        elif reply_language == "spanish":
-            user_content = "".join([user_content, "Contáctame en español"])
-        elif reply_language == "japanese":
-            user_content = "".join([user_content, "日本語で返事して"])
-        else:
-            user_content = "".join([user_content, "answer me in English"])
+        user_content = trans_reply(reply_language, user_content)
         if not get_model_online:
             os.environ['TRANSFORMERS_OFFLINE'] = "1"
         try:
@@ -182,7 +197,7 @@ class ChatQA_1p5_8b:
                     "FLOAT",
                     {"default": 0.9, "min": 0.01, "max": 0.99, "step": 0.01, "round": False, "display": "number"}),
                 "get_model_online": ("BOOLEAN", {"default": True},),
-                "reply_language": (["None", "chinese", "russian", "german", "french", "spanish", "japanese"],),
+                "reply_language": (["english", "chinese", "russian", "german", "french", "spanish", "japanese","Original_language"],),
                 "system": (
                     "STRING",
                     {"multiline": True,
@@ -220,20 +235,7 @@ class ChatQA_1p5_8b:
     def chatqa_1p5_8b(self, repo_id, max_new_tokens, temperature, top_p, get_model_online, reply_language, system,
                       instruction,
                       user_content):
-        if reply_language == "chinese":
-            user_content = "".join([user_content, "用中文回复我"])
-        elif reply_language == "russian":
-            user_content = "".join([user_content, "Ответь мне по - русски"])
-        elif reply_language == "german":
-            user_content = "".join([user_content, "Antworte mir auf Deutsch"])
-        elif reply_language == "french":
-            user_content = "".join([user_content, "Répondez - moi en français"])
-        elif reply_language == "spanish":
-            user_content = "".join([user_content, "Contáctame en español"])
-        elif reply_language == "japanese":
-            user_content = "".join([user_content, "日本語で返事して"])
-        else:
-            user_content = "".join([user_content, "answer me in English"])
+        user_content = trans_reply(reply_language, user_content)
         if not get_model_online:
             os.environ['TRANSFORMERS_OFFLINE'] = "1"
         try:
@@ -282,7 +284,7 @@ class MiniCPM_Llama3_V25:
                 "top_p": (
                     "FLOAT",
                     {"default": 0.9, "min": 0.01, "max": 0.99, "step": 0.01, "round": False, "display": "number"}),
-                "reply_language": (["None", "chinese", "russian", "german", "french", "spanish", "japanese"],),
+                "reply_language": (["english", "chinese", "russian", "german", "french", "spanish", "japanese","Original_language"],),
                 "question": ("STRING", {"multiline": True,
                                         "default": "What is in the image?"})
             }
@@ -295,20 +297,7 @@ class MiniCPM_Llama3_V25:
 
     def minicpm_llama3_v25(self, image, repo_id, max_new_tokens, temperature, top_p, reply_language,
                            question):
-        if reply_language == "chinese":
-            question = "".join([question, "用中文回复我"])
-        elif reply_language == "russian":
-            question = "".join([question, "Ответь мне по - русски"])
-        elif reply_language == "german":
-            question = "".join([question, "Antworte mir auf Deutsch"])
-        elif reply_language == "french":
-            question = "".join([question, "Répondez - moi en français"])
-        elif reply_language == "spanish":
-            question = "".join([question, "Contáctame en español"])
-        elif reply_language == "japanese":
-            question = "".join([question, "日本語で返事して"])
-        else:
-            question = "".join([question, "answer me in English"])
+        question = trans_reply(reply_language, question)
         try:
             model = AutoModel.from_pretrained(repo_id, trust_remote_code=True,
                                               torch_dtype=torch.float16)
